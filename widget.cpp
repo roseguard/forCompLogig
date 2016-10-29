@@ -1,4 +1,5 @@
 #include "widget.h"
+#include <QDebug>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -39,8 +40,6 @@ Widget::Widget(QWidget *parent)
     NSDTimeLay->addWidget(NSDTimeLine);
     mainLay->addLayout(NSDResultLay);
     mainLay->addLayout(NSDTimeLay);
-    NSDSolver = new Solver(this);
-    connect(NSDSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 
     mainLay->addItem(spacer);
 
@@ -56,8 +55,6 @@ Widget::Widget(QWidget *parent)
     evklidTimeLay->addWidget(evklidTimeLine);
     mainLay->addLayout(evklidResultLay);
     mainLay->addLayout(evklidTimeLay);
-    evklidSolver = new Solver(this);
-    connect(evklidSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 
     mainLay->addItem(spacer);
 
@@ -73,8 +70,6 @@ Widget::Widget(QWidget *parent)
     eulerTimeLay->addWidget(eulerTimeLine);
     mainLay->addLayout(eulerResultLay);
     mainLay->addLayout(eulerTimeLay);
-    eulerSolver = new Solver(this);
-    connect(eulerSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 
     mainLay->addItem(spacer);
 
@@ -90,8 +85,6 @@ Widget::Widget(QWidget *parent)
     modElementTimeLay->addWidget(modElementTimeLine);
     mainLay->addLayout(modElementResultLay);
     mainLay->addLayout(modElementTimeLay);
-    modElementSolver = new Solver(this);
-    connect(modElementSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 }
 
 Widget::~Widget()
@@ -128,25 +121,39 @@ void Widget::startSolving()
 {
     if(inputALine->text().isEmpty() && inputBLine->text().isEmpty())
         return;
-    NSDSolver->terminate();
-    modElementSolver->terminate();
-    evklidSolver->terminate();
-    eulerSolver->terminate();
-    NSDSolver = new Solver(this);
-    modElementSolver = new Solver(this);
-    evklidSolver = new Solver(this);
-    eulerSolver = new Solver(this);
+
+    qDebug() << "FIRST";
+    if(needDel)
+    {
+        NSDSolver->terminate();
+        modElementSolver->terminate();
+        evklidSolver->terminate();
+        eulerSolver->terminate();
+
+        delete NSDSolver;
+        delete modElementSolver;
+        delete evklidSolver;
+        delete eulerSolver;
+    }
+
+    u_int64_t tempa = inputALine->text().toLongLong();
+    u_int64_t tempb = inputBLine->text().toLongLong();
+
+    NSDSolver = new Solver("NSD", tempa, tempb, this);
+    modElementSolver = new Solver("modElement", tempa, tempb, this);
+    evklidSolver = new Solver("evklid", tempa, tempb, this);
+    eulerSolver = new Solver("euler", tempa, tempb, this);
+    needDel = true;
+
     connect(eulerSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
     connect(evklidSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
     connect(NSDSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
     connect(modElementSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 
-    u_int64_t tempa = inputALine->text().toLongLong();
-    u_int64_t tempb = inputBLine->text().toLongLong();
-    emit NSDSolver->solveNSD(tempa, tempb);
-    emit modElementSolver->solveModElement(tempa, tempb);
-    emit evklidSolver->solveEvklid(tempa, tempb);
-    emit eulerSolver->solveEuler(tempa, tempb);
+    NSDSolver->start();
+    modElementSolver->start();
+    evklidSolver->start();
+    eulerSolver->start();
 }
 
 

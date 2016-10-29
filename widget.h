@@ -64,6 +64,8 @@ public:
     QLabel              *modElementTimeLab;
     QLineEdit           *modElementTimeLine;
     Solver              *modElementSolver;
+
+    bool needDel = false;
 public slots:
     void someOneSolved(Solver * obj);
     void startSolving();

@@ -4,45 +4,47 @@
 #include <QThread>
 #include <QTime>
 
+#include "defines.h"
+
 struct evklStruct
 {
-    u_int64_t d;
-    u_int64_t x;
-    int y;
+    quint64 d;
+    quint64 x;
+    qint64 y;
 };
 
 class Solver : public QThread
 {
     Q_OBJECT
 public:
-    Solver(QString type, u_int64_t a, u_int64_t b, QObject *parent = 0);
+    Solver(QString type, quint64 a, quint64 b, QObject *parent = 0);
     void run();
 private:
-    u_int64_t _a;
-    u_int64_t _b;
-    u_int64_t _result;
-    u_int64_t _timeMS;
+    quint64 _a;
+    quint64 _b;
+    quint64 _result;
+    quint64 _timeMS;
     QTime counter;
     QString _type;
 public:
-    u_int64_t getLastResult();
-    u_int64_t getLastTimeMS();
-    u_int64_t pow(u_int64_t a, int b);
-    u_int64_t phi(u_int64_t n);
-    evklStruct gcdex(u_int64_t a, u_int64_t b);
+    quint64 getLastResult();
+    quint64 getLastTimeMS();
+    quint64 pow(quint64 a, int b);
+    quint64 phi(quint64 n);
+    evklStruct gcdex(quint64 a, quint64 b);
     QString solvingType();
 
 signals:
     void solvingFinished(Solver* object);
-//    void solveModElement(u_int64_t value, u_int64_t range);
-//    void solveNSD(u_int64_t a, u_int64_t b);
-//    void solveEvklid(u_int64_t a, u_int64_t b);
-//    void solveEuler(u_int64_t a, u_int64_t b);
+//    void solveModElement(quint64 value, quint64 range);
+//    void solveNSD(quint64 a, quint64 b);
+//    void solveEvklid(quint64 a, quint64 b);
+//    void solveEuler(quint64 a, quint64 b);
 private:
-    void modElementSolver(u_int64_t value, u_int64_t range);
-    void NSDSolver(u_int64_t a, u_int64_t b);
-    void evklidSolver(u_int64_t a, u_int64_t b);
-    void eulerSolve(u_int64_t a, u_int64_t b);
+    void modElementSolver(quint64 value, quint64 range);
+    void NSDSolver(quint64 _a, quint64 _b);
+    void evklidSolver(quint64 a, quint64 b);
+    void eulerSolve(quint64 a, quint64 b);
 };
 
 #endif // SOLVER_H

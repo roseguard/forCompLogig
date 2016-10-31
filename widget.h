@@ -11,6 +11,7 @@
 #include <QSpacerItem>
 
 #include "solver.h"
+#include "defines.h"
 
 class Widget : public QWidget
 {

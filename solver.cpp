@@ -1,7 +1,7 @@
 #include "solver.h"
 #include <QDebug>
 
-Solver::Solver(QString type, u_int64_t a, u_int64_t b, QObject *parent) : QThread(parent)
+Solver::Solver(QString type, quint64 a, quint64 b, QObject *parent) : QThread(parent)
 {
     _type = type;
     _a = a;
@@ -20,51 +20,61 @@ void Solver::run()
         evklidSolver(_a, _b);
 }
 
-void Solver::modElementSolver(u_int64_t value, u_int64_t range)
+void Solver::modElementSolver(quint64 value, quint64 range)
 {
     counter.start();
-    for(u_int64_t i = 1; i < range ; i++)
+    bool loopFin = false;
+    for(int i = 0; i < loopNum; i++)
     {
-        if ((((value * i) - 1) % range) == 0)
+        for(quint64 i = 1; i < range ; i++)
         {
-            _timeMS = counter.elapsed();
-            _result = i;
-            _type = "modElement";
-            emit this->solvingFinished(this);
-            return;
+            if ((((value * i) - 1) % range) == 0)
+            {
+                _result = i;
+                _type = "modElement";
+                loopFin = true;
+                break;
+            }
         }
+        if(loopFin)
+            break;
+        _result = 0;
+        _type = "modElement";
     }
     _timeMS = counter.elapsed();
-    _result = 0;
-    _type = "modElement";
     emit this->solvingFinished(this);
     return;
 }
 
-void Solver::NSDSolver(u_int64_t a, u_int64_t b)
+void Solver::NSDSolver(quint64 _a, quint64 _b)
 {
+    quint64 a = _a;
+    quint64 b = _b;
     counter.start();
-    while(a*b!=0)
+    for(int i = 0; i < loopNum; i++)
     {
-        if(a>=b)
+        while(a*b!=0)
         {
-            a = a % b;
+            if(a>=b)
+            {
+                a = a % b;
+            }
+            else
+            {
+                b = b % a;
+            }
         }
-        else
-        {
-            b = b % a;
-        }
+        _result = a + b;
+        _type = "NSD";
     }
-    _result = a + b;
     _timeMS = counter.elapsed();
-    _type = "NSD";
     emit this->solvingFinished(this);
     return;
 }
 
-void Solver::evklidSolver(u_int64_t a, u_int64_t b)
+void Solver::evklidSolver(quint64 a, quint64 b)
 {
-//    counter.start();
+    counter.start();
 //    while(a!=0 && b!=0)
 //    {
 //       if(a>=b) a=a%b;
@@ -75,59 +85,63 @@ void Solver::evklidSolver(u_int64_t a, u_int64_t b)
 //    _type = "evklid";
 //    emit this->solvingFinished(this);
 //    return;
-    evklStruct temp = gcdex(a, b);
-    if(temp.d == 1 && temp.y < 0)
-        _result = temp.x;
-    else
-        _result = -1;
+    for(int i = 0; i < loopNum; i++)
+    {
+        evklStruct temp = gcdex(a, b);
+        if(temp.d == 1 && temp.y < 0)
+            _result = temp.x;
+        else
+            _result = -1;
 
+        _type = "evklid";
+    }
     _timeMS = counter.elapsed();
-    _type = "evklid";
     emit this->solvingFinished(this);
     return;
 }
 
-void Solver::eulerSolve(u_int64_t a, u_int64_t b)
+void Solver::eulerSolve(quint64 a, quint64 b)
 {
     counter.start();
-    qDebug() << "PHI " << pow(a, phi(b));
-    u_int64_t tempVal = pow(a, (phi(b) - 1));
-    if(tempVal == -1)
-        _result = -1;
-    else
-        _result = pow(a, (phi(b) - 1)) % b;
+    for(int i = 0; i < loopNum; i++)
+    {
+        quint64 tempVal = pow(a, (phi(b) - 1));
+        if(tempVal == -1)
+            _result = -1;
+        else
+            _result = tempVal%b;        
+        _type = "euler";
+    }
     _timeMS = counter.elapsed();
-    _type = "euler";
     emit this->solvingFinished(this);
     return;
 }
 
-u_int64_t Solver::phi(u_int64_t n)
+quint64 Solver::phi(quint64 n)
 {
-    u_int64_t result = n;
-    for (u_int64_t i=2; i*i<=n; ++i)
+    quint64 result = n;
+    for (quint64 i=2; i*i<=n; ++i)
         if (n % i == 0) {
             while (n % i == 0)
                 n /= i;
             result -= result / i;
         }
     if (n > 1)
+    {
         result -= result / n;
+    }
     return result;
 }
 
-u_int64_t Solver::pow(u_int64_t a, int b)
+quint64 Solver::pow(quint64 a, int b)
 {
-    u_int64_t temp = a;
-    u_int64_t before = temp;
-    for(int i = 0; i < b; i++)
+    quint64 temp = a;
+    quint64 before = temp;
+    for(int i = 0; i < b-1; i++)
     {
         temp*=a;
-        qDebug() << "BEF : " << before;
-        qDebug() << "TEMP : " << temp;
         if(before > temp)
         {
-            qDebug() << "BAAADAS";
             return -1;
         }
         else
@@ -136,12 +150,12 @@ u_int64_t Solver::pow(u_int64_t a, int b)
     return temp;
 }
 
-u_int64_t Solver::getLastResult()
+quint64 Solver::getLastResult()
 {
     return _result;
 }
 
-u_int64_t Solver::getLastTimeMS()
+quint64 Solver::getLastTimeMS()
 {
     return _timeMS;
 }
@@ -151,7 +165,7 @@ QString Solver::solvingType()
     return _type;
 }
 
-evklStruct Solver::gcdex(u_int64_t a, u_int64_t b)
+evklStruct Solver::gcdex(quint64 a, quint64 b)
 {
     struct evklStruct temp;
     if (b == 0)

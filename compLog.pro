@@ -12,12 +12,16 @@ TARGET = compLog
 TEMPLATE = app
 
 
+
+
+
 SOURCES += main.cpp\
         widget.cpp \
     solver.cpp
 
 HEADERS  += widget.h \
-    solver.h
+    solver.h \
+    defines.h
 
 CONFIG += mobility
 MOBILITY = 

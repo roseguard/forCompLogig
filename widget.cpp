@@ -6,6 +6,9 @@ Widget::Widget(QWidget *parent)
 {
     mainLay = new QVBoxLayout(this);
     this->setLayout(mainLay);
+    alarms = new QTextBrowser(this);
+    alarms->setReadOnly(true);
+    mainLay->addWidget(alarms);
     spacer = new QSpacerItem(1, 10);
     mainLay->addItem(spacer);
 
@@ -32,11 +35,13 @@ Widget::Widget(QWidget *parent)
     NSDResultLay = new QHBoxLayout;
     NSDResultLab = new QLabel("NSD result", this);
     NSDResultLine = new QLineEdit(this);
+    NSDResultLine->setReadOnly(true);
     NSDResultLay->addWidget(NSDResultLab);
     NSDResultLay->addWidget(NSDResultLine);
     NSDTimeLay = new QHBoxLayout;
     NSDTimeLab = new QLabel("NSD time : ", this);
     NSDTimeLine = new QLineEdit(this);
+    NSDTimeLine->setReadOnly(true);
     NSDTimeLay->addWidget(NSDTimeLab);
     NSDTimeLay->addWidget(NSDTimeLine);
     mainLay->addLayout(NSDResultLay);
@@ -47,11 +52,13 @@ Widget::Widget(QWidget *parent)
     evklidResultLay = new QHBoxLayout;
     evklidResultLab = new QLabel("Evklid result", this);
     evklidResultLine = new QLineEdit(this);
+    evklidResultLine->setReadOnly(true);
     evklidResultLay->addWidget(evklidResultLab);
     evklidResultLay->addWidget(evklidResultLine);
     evklidTimeLay = new QHBoxLayout;
     evklidTimeLab = new QLabel("Evklid time", this);
     evklidTimeLine = new QLineEdit(this);
+    evklidTimeLine->setReadOnly(true);
     evklidTimeLay->addWidget(evklidTimeLab);
     evklidTimeLay->addWidget(evklidTimeLine);
     mainLay->addLayout(evklidResultLay);
@@ -62,11 +69,13 @@ Widget::Widget(QWidget *parent)
     eulerResultLay = new QHBoxLayout;
     eulerResultLab = new QLabel("Euler result", this);
     eulerResultLine = new QLineEdit(this);
+    eulerResultLine->setReadOnly(true);
     eulerResultLay->addWidget(eulerResultLab);
     eulerResultLay->addWidget(eulerResultLine);
     eulerTimeLay = new QHBoxLayout;
     eulerTimeLab = new QLabel("Euler time", this);
     eulerTimeLine = new QLineEdit(this);
+    eulerTimeLine->setReadOnly(true);
     eulerTimeLay->addWidget(eulerTimeLab);
     eulerTimeLay->addWidget(eulerTimeLine);
     mainLay->addLayout(eulerResultLay);
@@ -77,11 +86,13 @@ Widget::Widget(QWidget *parent)
     modElementResultLay = new QHBoxLayout;
     modElementResultLab = new QLabel("Mod Element result", this);
     modElementResultLine = new QLineEdit(this);
+    modElementResultLine->setReadOnly(true);
     modElementResultLay->addWidget(modElementResultLab);
     modElementResultLay->addWidget(modElementResultLine);
     modElementTimeLay = new QHBoxLayout;
     modElementTimeLab = new QLabel("Mod Element time", this);
     modElementTimeLine = new QLineEdit(this);
+    modElementTimeLine->setReadOnly(true);
     modElementTimeLay->addWidget(modElementTimeLab);
     modElementTimeLay->addWidget(modElementTimeLine);
     mainLay->addLayout(modElementResultLay);
@@ -172,14 +183,47 @@ void Widget::startSolving()
     connect(NSDSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
     connect(modElementSolver, SIGNAL(solvingFinished(Solver*)), this, SLOT(someOneSolved(Solver*)));
 
+    connect(eulerSolver, SIGNAL(pushAlarm(QString)), this, SLOT(newAlarm(QString)));
+    connect(evklidSolver, SIGNAL(pushAlarm(QString)), this, SLOT(newAlarm(QString)));
+    connect(NSDSolver, SIGNAL(pushAlarm(QString)), this, SLOT(newAlarm(QString)));
+    connect(modElementSolver, SIGNAL(pushAlarm(QString)), this, SLOT(newAlarm(QString)));
+
     NSDSolver->start();
     modElementSolver->start();
     evklidSolver->start();
     eulerSolver->start();
 }
 
+void Widget::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << event->text();
+    if(event->text()=="\r")
+    {
+        startSolving();
+        return;
+    }
+    else if(event->text()=="right")
+    {
+        if(focusA)
+        {
+            inputBLine->setFocus();
+            focusA = false;
+            return;
+        }
+        else
+        {
+            inputALine->setFocus();
+            focusA = true;
+            return;
+        }
+    }
 
+}
 
+void Widget::newAlarm(QString message)
+{
+    alarms->append(message);
+}
 
 
 

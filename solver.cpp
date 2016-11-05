@@ -15,7 +15,7 @@ void Solver::run()
     else if(_type == "NSD")
         NSDSolver(_a, _b);
     else if(_type == "euler")
-        eulerSolve(_a, _b);
+        eulerSolver(_a, _b);
     else if(_type == "evklid")
         evklidSolver(_a, _b);
 }
@@ -75,23 +75,15 @@ void Solver::NSDSolver(quint64 _a, quint64 _b)
 void Solver::evklidSolver(quint64 a, quint64 b)
 {
     counter.start();
-//    while(a!=0 && b!=0)
-//    {
-//       if(a>=b) a=a%b;
-//       else b=b%a;
-//    }
-//    _result = a + b;
-//    _timeMS = counter.elapsed();
-//    _type = "evklid";
-//    emit this->solvingFinished(this);
-//    return;
     for(int i = 0; i < loopNum; i++)
     {
         evklStruct temp = gcdex(a, b);
         if(temp.d == 1 && temp.y < 0)
             _result = temp.x;
         else
-            _result = -1;
+        {
+            _result = b + temp.x;
+        }
 
         _type = "evklid";
     }
@@ -100,17 +92,47 @@ void Solver::evklidSolver(quint64 a, quint64 b)
     return;
 }
 
-void Solver::eulerSolve(quint64 a, quint64 b)
+void Solver::eulerSolver(quint64 _a, quint64 _b)
 {
     counter.start();
     for(int i = 0; i < loopNum; i++)
     {
-        quint64 tempVal = pow(a, (phi(b) - 1));
-        if(tempVal == -1)
-            _result = -1;
-        else
-            _result = tempVal%b;        
-        _type = "euler";
+        quint64 a = _a;
+        quint64 b = _b;
+        quint64 powa = phi(b) - 1;
+        QVector<quint64> zalysh;
+        while (powa >=2)
+        {
+            if (powa % 2 != 0)
+            {
+                powa -= 1;
+                zalysh.append(a);
+                powa /= 2;
+                a = (a*a) % b;
+            }
+            else
+            {
+                powa /= 2;
+                a = (a*a) % b;
+            }
+        }
+
+        for(int i = 0; i < zalysh.length(); i++)
+        {
+            a *= zalysh.at(i);
+        }
+
+        if(a>b)
+        {
+            a-=(a/b)*b;
+        }
+        while(a > b)
+        {
+            a -= b;
+        }
+
+        qint64 z = pow(a,powa) % b;
+        _result = z;
     }
     _timeMS = counter.elapsed();
     emit this->solvingFinished(this);
@@ -137,6 +159,12 @@ quint64 Solver::pow(quint64 a, int b)
 {
     quint64 temp = a;
     quint64 before = temp;
+    if(b > 20)
+    {
+        QString mess = _type + " : ";
+        mess.append("великий степінь, відсутня можливість підрахувати.");
+        emit pushAlarm(mess);
+    }
     for(int i = 0; i < b-1; i++)
     {
         temp*=a;

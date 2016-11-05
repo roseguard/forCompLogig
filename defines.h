@@ -1,7 +1,7 @@
 #ifndef DEFINES
 #define DEFINES
 
-#define loopNum 10000
+#define loopNum 1
 
 #endif // DEFINES
 

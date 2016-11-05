@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QTextBrowser>
 #include <QSpacerItem>
+#include <QKeyEvent>
 
 #include "solver.h"
 #include "defines.h"
@@ -22,6 +23,7 @@ public:
     ~Widget();
 
     QVBoxLayout         *mainLay;
+    QTextBrowser        *alarms;
     QSpacerItem         *spacer;
 
     QHBoxLayout         *inputALay;
@@ -67,9 +69,13 @@ public:
     Solver              *modElementSolver;
 
     bool needDel = false;
+    bool focusA = true;
+
+    void keyPressEvent(QKeyEvent *);
 public slots:
     void someOneSolved(Solver * obj);
     void startSolving();
+    void newAlarm(QString message);
 };
 
 #endif // WIDGET_H

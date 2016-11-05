@@ -36,6 +36,7 @@ public:
 
 signals:
     void solvingFinished(Solver* object);
+    void pushAlarm(QString message);
 //    void solveModElement(quint64 value, quint64 range);
 //    void solveNSD(quint64 a, quint64 b);
 //    void solveEvklid(quint64 a, quint64 b);
@@ -44,7 +45,7 @@ private:
     void modElementSolver(quint64 value, quint64 range);
     void NSDSolver(quint64 _a, quint64 _b);
     void evklidSolver(quint64 a, quint64 b);
-    void eulerSolve(quint64 a, quint64 b);
+    void eulerSolver(quint64 _a, quint64 _b);
 };
 
 #endif // SOLVER_H

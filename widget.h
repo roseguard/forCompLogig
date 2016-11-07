@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QTextBrowser>
-#include <QSpacerItem>
 #include <QKeyEvent>
 
 #include "solver.h"
@@ -24,7 +23,8 @@ public:
 
     QVBoxLayout         *mainLay;
     QTextBrowser        *alarms;
-    QSpacerItem         *spacer;
+
+    QPushButton         *showErrors;
 
     QHBoxLayout         *inputALay;
     QLabel              *inputALab;
@@ -36,6 +36,8 @@ public:
 
     QPushButton         *solveButt;
 
+
+    QLabel              *NSDLab;
     QHBoxLayout         *NSDResultLay;
     QLabel              *NSDResultLab;
     QLineEdit           *NSDResultLine;
@@ -44,6 +46,7 @@ public:
     QLineEdit           *NSDTimeLine;
     Solver              *NSDSolver;
 
+    QLabel              *evklidLab;
     QHBoxLayout         *evklidResultLay;
     QLabel              *evklidResultLab;
     QLineEdit           *evklidResultLine;
@@ -52,6 +55,7 @@ public:
     QLineEdit           *evklidTimeLine;
     Solver              *evklidSolver;
 
+    QLabel              *eulerLab;
     QHBoxLayout         *eulerResultLay;
     QLabel              *eulerResultLab;
     QLineEdit           *eulerResultLine;
@@ -60,6 +64,7 @@ public:
     QLineEdit           *eulerTimeLine;
     Solver              *eulerSolver;
 
+    QLabel              *modElementLab;
     QHBoxLayout         *modElementResultLay;
     QLabel              *modElementResultLab;
     QLineEdit           *modElementResultLine;

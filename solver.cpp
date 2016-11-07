@@ -101,6 +101,14 @@ void Solver::eulerSolver(quint64 _a, quint64 _b)
         quint64 b = _b;
         quint64 powa = phi(b) - 1;
         QVector<quint64> zalysh;
+        if(a>b)
+        {
+            a-=(a/b)*b;
+        }
+        while(a > b)
+        {
+            a -= b;
+        }
         while (powa >=2)
         {
             if (powa % 2 != 0)
@@ -116,10 +124,19 @@ void Solver::eulerSolver(quint64 _a, quint64 _b)
                 a = (a*a) % b;
             }
         }
-
+        quint64 beforeA = a;
         for(int i = 0; i < zalysh.length(); i++)
         {
             a *= zalysh.at(i);
+            if (a < beforeA)
+            {
+                emit pushAlarm(_type + " : " + "при обчисленні виникли надто великі значення(a*n). a = " +
+                               QString::number(beforeA) + ", n = " + QString::number(zalysh.at(i)) + ", max = " +
+                               QString::number((quint64)-1) + ", i/lenght = " + QString::number(i) + "/" + QString::number(zalysh.length()));
+                return;
+            }
+            else
+                beforeA = a;
         }
 
         if(a>b)

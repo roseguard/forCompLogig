@@ -5,41 +5,43 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
     mainLay = new QVBoxLayout(this);
-    this->setLayout(mainLay);
-    alarms = new QTextBrowser(this);
+    setLayout(mainLay);
+    alarms = new QTextBrowser;
     alarms->setReadOnly(true);
-    mainLay->addWidget(alarms);
-    spacer = new QSpacerItem(1, 10);
-    mainLay->addItem(spacer);
+
+    showErrors = new QPushButton("Показати помилки", this);
+    connect(showErrors, SIGNAL(clicked(bool)), alarms, SLOT(show()));
+    mainLay->addWidget(showErrors);
 
     inputALay = new QHBoxLayout;
-    inputALab = new QLabel("Input A", this);
+    inputALab = new QLabel("Значення а", this);
     inputALine = new QLineEdit(this);
     inputALay->addWidget(inputALab);
     inputALay->addWidget(inputALine);
     mainLay->addLayout(inputALay);
 
     inputBLay = new QHBoxLayout;
-    inputBLab = new QLabel("Input B", this);
+    inputBLab = new QLabel("Значення б", this);
     inputBLine = new QLineEdit(this);
     inputBLay->addWidget(inputBLab);
     inputBLay->addWidget(inputBLine);
     mainLay->addLayout(inputBLay);
 
-    solveButt = new QPushButton("SOLVE", this);
+    solveButt = new QPushButton("Обрахувати", this);
     connect(solveButt, SIGNAL(clicked(bool)), this, SLOT(startSolving()));
     mainLay->addWidget(solveButt);
 
-    mainLay->addItem(spacer);
-
+    NSDLab = new QLabel("НСД", this);
+    NSDLab->setAlignment(Qt::AlignCenter);
+    mainLay->addWidget(NSDLab);
     NSDResultLay = new QHBoxLayout;
-    NSDResultLab = new QLabel("NSD result", this);
+    NSDResultLab = new QLabel("Результат", this);
     NSDResultLine = new QLineEdit(this);
     NSDResultLine->setReadOnly(true);
     NSDResultLay->addWidget(NSDResultLab);
     NSDResultLay->addWidget(NSDResultLine);
     NSDTimeLay = new QHBoxLayout;
-    NSDTimeLab = new QLabel("NSD time : ", this);
+    NSDTimeLab = new QLabel("Час", this);
     NSDTimeLine = new QLineEdit(this);
     NSDTimeLine->setReadOnly(true);
     NSDTimeLay->addWidget(NSDTimeLab);
@@ -47,16 +49,17 @@ Widget::Widget(QWidget *parent)
     mainLay->addLayout(NSDResultLay);
     mainLay->addLayout(NSDTimeLay);
 
-    mainLay->addItem(spacer);
-
+    evklidLab = new QLabel("Евклід", this);
+    evklidLab->setAlignment(Qt::AlignCenter);
+    mainLay->addWidget(evklidLab);
     evklidResultLay = new QHBoxLayout;
-    evklidResultLab = new QLabel("Evklid result", this);
+    evklidResultLab = new QLabel("Результат", this);
     evklidResultLine = new QLineEdit(this);
     evklidResultLine->setReadOnly(true);
     evklidResultLay->addWidget(evklidResultLab);
     evklidResultLay->addWidget(evklidResultLine);
     evklidTimeLay = new QHBoxLayout;
-    evklidTimeLab = new QLabel("Evklid time", this);
+    evklidTimeLab = new QLabel("Час", this);
     evklidTimeLine = new QLineEdit(this);
     evklidTimeLine->setReadOnly(true);
     evklidTimeLay->addWidget(evklidTimeLab);
@@ -64,16 +67,17 @@ Widget::Widget(QWidget *parent)
     mainLay->addLayout(evklidResultLay);
     mainLay->addLayout(evklidTimeLay);
 
-    mainLay->addItem(spacer);
-
+    eulerLab = new QLabel("Ейлер", this);
+    eulerLab->setAlignment(Qt::AlignCenter);
+    mainLay->addWidget(eulerLab);
     eulerResultLay = new QHBoxLayout;
-    eulerResultLab = new QLabel("Euler result", this);
+    eulerResultLab = new QLabel("Результат", this);
     eulerResultLine = new QLineEdit(this);
     eulerResultLine->setReadOnly(true);
     eulerResultLay->addWidget(eulerResultLab);
     eulerResultLay->addWidget(eulerResultLine);
     eulerTimeLay = new QHBoxLayout;
-    eulerTimeLab = new QLabel("Euler time", this);
+    eulerTimeLab = new QLabel("Час", this);
     eulerTimeLine = new QLineEdit(this);
     eulerTimeLine->setReadOnly(true);
     eulerTimeLay->addWidget(eulerTimeLab);
@@ -81,16 +85,17 @@ Widget::Widget(QWidget *parent)
     mainLay->addLayout(eulerResultLay);
     mainLay->addLayout(eulerTimeLay);
 
-    mainLay->addItem(spacer);
-
+    modElementLab = new QLabel("Перебір", this);
+    modElementLab->setAlignment(Qt::AlignCenter);
+    mainLay->addWidget(modElementLab);
     modElementResultLay = new QHBoxLayout;
-    modElementResultLab = new QLabel("Mod Element result", this);
+    modElementResultLab = new QLabel("Результат", this);
     modElementResultLine = new QLineEdit(this);
     modElementResultLine->setReadOnly(true);
     modElementResultLay->addWidget(modElementResultLab);
     modElementResultLay->addWidget(modElementResultLine);
     modElementTimeLay = new QHBoxLayout;
-    modElementTimeLab = new QLabel("Mod Element time", this);
+    modElementTimeLab = new QLabel("Час", this);
     modElementTimeLine = new QLineEdit(this);
     modElementTimeLine->setReadOnly(true);
     modElementTimeLay->addWidget(modElementTimeLab);
@@ -101,6 +106,7 @@ Widget::Widget(QWidget *parent)
 
 Widget::~Widget()
 {
+    alarms->close();
     if(needDel)
     {
         NSDSolver->terminate();
@@ -223,6 +229,7 @@ void Widget::keyPressEvent(QKeyEvent *event)
 void Widget::newAlarm(QString message)
 {
     alarms->append(message);
+    alarms->append("");
 }
 
 
